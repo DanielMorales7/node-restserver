@@ -1,6 +1,7 @@
 import { response, request } from "express";
-import usuarioModel from "../models/usuarioModel.js";
+import UsuarioModel from "../models/usuarioModel.js";
 import bcryptjs from "bcryptjs"
+
 
 // Send a user to DB
 const post_users = async (req, res, next) => {
@@ -9,19 +10,28 @@ const post_users = async (req, res, next) => {
 
     try {
         
-        const user = new usuarioModel({nombre, correo, password, rol});
+        const user = new UsuarioModel({nombre, correo, password, rol});
 
-        // Verificr si el correo existe
+        // Verificar si el correo existe
 
-        res.json({user});
+        const existeEmail = await UsuarioModel.findOne({correo});
+
+        if(existeEmail){
+
+            return res.status(400).json({
+                msg:'El correo ya está registrado'
+            });
+        }
+
         // Encriptar la contraseña
         const salt = bcryptjs.genSaltSync();
         user.password = bcryptjs.hashSync(password, salt);
-
+        
         // // guardar en BD
-
+        
         await user.save(req.body);
-
+        
+        res.json({user});
 
     } catch (error) {
         console.log(error);
