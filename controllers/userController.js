@@ -1,5 +1,5 @@
 import { response, request } from "express";
-import UsuarioModel from "../models/usuarioModel.js";
+import usuarioModel from "../models/usuarioModel.js";
 import bcryptjs from "bcryptjs"
 
 
@@ -10,18 +10,9 @@ const post_users = async (req, res, next) => {
 
     try {
         
-        const user = new UsuarioModel({nombre, correo, password, rol});
+        const user = new usuarioModel({nombre, correo, password, rol});
 
         // Verificar si el correo existe
-
-        const existeEmail = await UsuarioModel.findOne({correo});
-
-        if(existeEmail){
-
-            return res.status(400).json({
-                msg:'El correo ya está registrado'
-            });
-        }
 
         // Encriptar la contraseña
         const salt = bcryptjs.genSaltSync();
@@ -51,14 +42,33 @@ const get_users = (req, res) => {
     });
 }
 
-const put_users = (req, res) => {
+const put_users = async(req, res) => {
 
     const {id} = req.params;
+    const {password, google, correo, ...resto} = req.body;
 
-    res.status(200).json({
-        "msg":req.body,
-        id
-    });
+    // TODO válidar contra BD
+    if(password){
+        const salt = bcryptjs.genSaltSync();
+        resto.password = bcryptjs.hashSync(password, salt);
+    }
+
+    try {
+        
+        const user = await usuarioModel.findByIdAndUpdate(id, resto, {new:true})
+        
+        res.status(200).json({
+            "msg":"El usuario ha sido actualizado",
+            user
+        });
+
+    } catch (error) {
+
+        console.log(error);
+        next();
+
+    }
+
 }
 
 const delete_users = (req, res) => {
