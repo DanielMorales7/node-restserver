@@ -18,4 +18,13 @@ const emailExist = async(correo='') =>{
     }
 }
 
-export { rolValidate, emailExist }
+const userExist = async(id) =>{
+
+    const existeUsuario = await usuarioModel.findById(id);
+
+    if(!existeUsuario){
+        throw new Error(`El usuario ${id} no existe en la BD`);
+    }
+}
+
+export { rolValidate, emailExist, userExist }

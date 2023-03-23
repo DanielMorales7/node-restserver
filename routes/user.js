@@ -3,7 +3,7 @@ import { check } from "express-validator";
 const router = Router();
 
 import { delete_users, get_users, patch_users, post_users, put_users } from "../controllers/userController.js";
-import { rolValidate, emailExist } from "../helpers/db-validators.js";
+import { rolValidate, emailExist, userExist } from "../helpers/db-validators.js";
 import { validarCampos } from "../middlewares/validar-campos.js";
 
 router.route('/')
@@ -17,11 +17,17 @@ router.route('/')
         check('rol').custom( rolValidate ),
         validarCampos
     ], post_users)
-    .delete(delete_users)
     .patch(patch_users)
 
 router.route('/:id')
-    .put(put_users)
+    .put([
+    check('id','No es un ID válido').isMongoId(),
+    check('id').custom(userExist),
+    validarCampos,
+    ], put_users)
+    .delete(delete_users)
+
+
 
 
 

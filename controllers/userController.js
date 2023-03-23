@@ -31,23 +31,42 @@ const post_users = async (req, res, next) => {
 
 }
 
-const get_users = (req, res) => {
+const get_users = async(req, res) => {
 
-    const {nombre, r ='no param'} = req.query;
+    // const {nombre, r ='no param'} = req.query;
+    const {limit=5, desde = 0} = req.query;
+    // const usuarios = await usuarioModel.find({estado:true})
+    //     .skip(Number(desde))
+    //     .limit(Number(limit));
+
+    // const totally = await usuarioModel.countDocuments({estado:true});
+
+    // ***** IMPORTANTE SI LA CONSULTA ANTERIOR DEPENDE DE LA OTRA ENTONCES COLOCAMOS AWAIT
+
+    const [totally, users] = await Promise.all([
+        usuarioModel.countDocuments({estado:true}),
+        usuarioModel.find({estado:true})
+            .skip(Number(desde))
+            .limit(Number(limit))
+    ]);
+
 
     res.status(200).json({
-        "msg":"Controller- API",
-        nombre,
-        r
+        totally,
+        users
     });
 }
 
 const put_users = async(req, res) => {
 
-    const {id} = req.params;
-    const {password, google, correo, ...resto} = req.body;
+    let msg = '';
 
-    // TODO válidar contra BD
+    const {id} = req.params;
+    const {_id, password, google, correo, ...resto} = req.body;
+
+    (resto.estado === undefined || resto.estado ) ? msg = 'Se ha actualizado correctamente' : msg = 'Se ha borrado  correctamente';
+
+    // TODO válidar contra BD PruebaT-temp-0322
     if(password){
         const salt = bcryptjs.genSaltSync();
         resto.password = bcryptjs.hashSync(password, salt);
@@ -58,7 +77,7 @@ const put_users = async(req, res) => {
         const user = await usuarioModel.findByIdAndUpdate(id, resto, {new:true})
         
         res.status(200).json({
-            "msg":"El usuario ha sido actualizado",
+            msg,
             user
         });
 
