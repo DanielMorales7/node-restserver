@@ -1,12 +1,12 @@
 import { Router } from "express";
 import { check } from "express-validator";
-const router = Router();
+const routerUsers = Router();
 
 import { delete_users, get_users, patch_users, post_users, put_users } from "../controllers/userController.js";
 import { rolValidate, emailExist, userExist } from "../helpers/db-validators.js";
 import { validarCampos } from "../middlewares/validar-campos.js";
 
-router.route('/')
+routerUsers.route('/')
     .get(get_users)
     .post([
         check('nombre','El nombre no debe ir vacio').not().isEmpty(),
@@ -19,7 +19,7 @@ router.route('/')
     ], post_users)
     .patch(patch_users)
 
-router.route('/:id')
+routerUsers.route('/:id')
     .put([
     check('id','No es un ID válido').isMongoId(),
     check('id').custom(userExist),
@@ -31,4 +31,4 @@ router.route('/:id')
 
 
 
-export default router;
+export default routerUsers;
