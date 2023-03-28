@@ -12,5 +12,5 @@ const validarCampos = (req, res, next) =>{
 }
 
 export {
-validarCampos
+    validarCampos
 }

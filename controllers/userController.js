@@ -64,7 +64,7 @@ const put_users = async(req, res) => {
     const {id} = req.params;
     const {_id, password, google, correo, ...resto} = req.body;
 
-    (resto.estado === undefined || resto.estado ) ? msg = 'Se ha actualizado correctamente' : msg = 'Se ha borrado  correctamente';
+    (resto.estado === undefined || (resto.estado === true )  ) ? msg = 'Se ha actualizado correctamente' : msg = 'Se ha borrado  correctamente';
 
     // TODO válidar contra BD PruebaT-temp-0322
     if(password){

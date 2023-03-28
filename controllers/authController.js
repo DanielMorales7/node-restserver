@@ -1,5 +1,6 @@
 import usuarioModel from "../models/usuarioModel.js";
 import bcryptjs from "bcryptjs"
+import { generarJWT } from "../helpers/generar-jwt.js";
 
 const post_login = async(req, res) =>{
 
@@ -33,10 +34,13 @@ const post_login = async(req, res) =>{
             });
         }
 
-        //Generar JWT
+        //Generar JWT -> se quiere regresar como una promesa
+
+        const token = await generarJWT( user.id);
 
         res.json({
-            msg:'Login ok'
+            user,
+            token
         });
     
 
