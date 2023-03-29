@@ -6,6 +6,8 @@ import { delete_users, get_users, patch_users, post_users, put_users } from "../
 import { rolValidate, emailExist, userExist } from "../helpers/db-validators.js";
 import { validarCampos } from "../middlewares/validar-campos.js";
 import { validarJWT } from "../middlewares/validar-jwt.js";
+import { isAdminRole, roleExist } from "../middlewares/validar-roles.js";
+
 
 routerUsers.route('/')
     .get(get_users)
@@ -23,6 +25,8 @@ routerUsers.route('/')
 routerUsers.route('/:id')
     .put([
     validarJWT,
+    // isAdminRole,
+    roleExist('ADMIN_ROLE'),
     check('id','No es un ID válido').isMongoId(),
     check('id').custom(userExist),
     validarCampos,

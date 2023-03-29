@@ -75,8 +75,11 @@ const put_users = async(req, res) => {
     try {
         
         const user = await usuarioModel.findByIdAndUpdate(id, resto, {new:true})
+
+        //const userAuth = req.userAuth; -> se obtiene información especifica de un requesr
         
         res.status(200).json({
+            
             msg,
             user
         });
