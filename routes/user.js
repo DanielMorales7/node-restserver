@@ -2,12 +2,13 @@ import { Router } from "express";
 import { check } from "express-validator";
 const routerUsers = Router();
 
-import { delete_users, get_users, patch_users, post_users, put_users } from "../controllers/userController.js";
 import { rolValidate, emailExist, userExist } from "../helpers/db-validators.js";
+
 import { validarCampos } from "../middlewares/validar-campos.js";
 import { validarJWT } from "../middlewares/validar-jwt.js";
 import { isAdminRole, roleExist } from "../middlewares/validar-roles.js";
 
+import { delete_users, get_users, patch_users, post_users, put_users } from "../controllers/userController.js";
 
 routerUsers.route('/')
     .get(get_users)
