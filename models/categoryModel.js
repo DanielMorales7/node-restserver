@@ -13,7 +13,7 @@ const CategorySchema = Schema({
         required:true
     },
     usuario:{
-        type: Schema.Types.ObjectId,
+        type:Schema.ObjectId,
         ref:'usuarioModel',
         required:true
     }

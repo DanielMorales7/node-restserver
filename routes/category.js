@@ -5,6 +5,8 @@ import { validarCampos } from "../middlewares/validar-campos.js";
 
 import { get_categories, get_category, post_createCategory } from "../controllers/categoriesController.js";
 import { validarJWT } from "../middlewares/validar-jwt.js";
+import { categoryExist } from "../helpers/db-validators.js";
+
 
 const routerCategory = Router();
 
@@ -15,7 +17,11 @@ routerCategory.route('/')
 // Obtener una categoria por id - Publico
 
 routerCategory.route('/:id')
-    .get(get_category)
+    .get([
+        check('id','No es un ID válido').isMongoId(),
+        check('id').custom(categoryExist),
+        validarCampos
+    ],get_category)
 
 // Crear categoria - privado - cualquier persona con un token válido
 routerCategory.route('/')
@@ -26,8 +32,10 @@ routerCategory.route('/')
     ],post_createCategory)
 
 // Actualizar una categoria -privado - cualquier persona con un token válido
-routerCategory.route('/:id')
-    .put()
+// routerCategory.route('/:id')
+//     .put([
+//      check('id').custom(categoryExist)   
+//     ])
 
 // Borrar Categoria - solo un admin
 routerCategory.route('/:id')

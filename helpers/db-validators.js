@@ -1,5 +1,6 @@
 import Role from "../models/rolModel.js";
 import usuarioModel from "../models/usuarioModel.js";
+import categoryModel from "../models/categoryModel.js"
 
 const rolValidate = async(rol = '') => {
     const existeRol = await Role.findOne({rol});
@@ -27,4 +28,15 @@ const userExist = async(id) =>{
     }
 }
 
-export { rolValidate, emailExist, userExist }
+
+const categoryExist = async (id) =>{
+
+    const existeCategoria = await categoryModel.findById(id)
+
+    if(!existeCategoria){
+        throw new Error(`La categoria ${id} no existe en la BD`);
+    }
+}
+
+
+export { rolValidate, emailExist, userExist, categoryExist }

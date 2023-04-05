@@ -1,12 +1,51 @@
 import categoryModel from "../models/categoryModel.js";
+import usuarioModel from "../models/usuarioModel.js";
+import mongoose from "mongoose";
 
-const get_categories = (req, res)=>{
+// Obtener categorias - paginado - total -populate
+
+const get_categories = async (req, res)=>{
+
+    const {limit=5, desde = 0} = req.query;
+
+    try {
+
+        const [totaly, categories] = await  Promise.all([
+            categoryModel.countDocuments({estado:true}),
+            categoryModel.find({estado:true})
+                .populate('usuario')
+                .populate({
+                    path:'usuario',
+                    model:'usuarioModel'
+                })
+                .skip(Number(desde))
+                .limit(Number(limit))
+        ]);
+
+        res.status(200).json({
+            categories,
+            totaly
+        });
+        
+    } catch (error) {
+        
+        console.log(error)
+    }
+
+}
+
+// Obtener categoria - populate
+
+const get_category = (req, res)=>{
+
+    const {id} = req.params;
 
     res.json({
-        msg:'Todo fine'
+        msg:'Existe'
     });
 
 }
+
 
 const post_createCategory = async (req, res) => {
 
@@ -39,13 +78,10 @@ const post_createCategory = async (req, res) => {
     res.status(201).json(categoria);
 }
 
-const get_category = (req, res)=>{
+// Actualizar categoria
 
-    res.json({
-        msg:req.body
-    });
+// Borrar categoria - cambiar a false
 
-}
 
 export {
     get_categories,
