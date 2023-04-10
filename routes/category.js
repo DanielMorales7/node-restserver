@@ -3,9 +3,10 @@ import { check } from "express-validator";
 
 import { validarCampos } from "../middlewares/validar-campos.js";
 
-import { get_categories, get_category, post_createCategory } from "../controllers/categoriesController.js";
+import { delete_deleteCategory, get_categories, get_category, post_createCategory, put_updateCategory } from "../controllers/categoriesController.js";
 import { validarJWT } from "../middlewares/validar-jwt.js";
 import { categoryExist } from "../helpers/db-validators.js";
+import { isAdminRole } from "../middlewares/validar-roles.js";
 
 
 const routerCategory = Router();
@@ -32,13 +33,23 @@ routerCategory.route('/')
     ],post_createCategory)
 
 // Actualizar una categoria -privado - cualquier persona con un token válido
-// routerCategory.route('/:id')
-//     .put([
-//      check('id').custom(categoryExist)   
-//     ])
+routerCategory.route('/:id')
+    .put([
+    validarJWT,
+    check('id','No es un ID válido').isMongoId(),
+    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    check('id').custom(categoryExist),
+    validarCampos  
+    ], put_updateCategory)
 
 // Borrar Categoria - solo un admin
 routerCategory.route('/:id')
-    .delete()
+    .delete([
+        validarJWT,
+        isAdminRole,
+        check('id','No es un ID válido').isMongoId(),
+        check('id').custom(categoryExist),
+        validarCampos
+    ], delete_deleteCategory);
 
 export default routerCategory;

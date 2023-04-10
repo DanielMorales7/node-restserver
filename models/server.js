@@ -4,6 +4,7 @@ import routerUsers from '../routes/user.js';
 import routerAuth from '../routes/auth.js';
 import routerCategory from '../routes/category.js'
 import { dbConnection } from '../database/config.js';
+import routerProducts from '../routes/products.js';
 
 
 class  Server {
@@ -15,7 +16,8 @@ class  Server {
         this.paths = {
             usuarios:'/api/usuarios',
             auth:'/api/auth',
-            category:'/api/category'
+            category:'/api/category',
+            products:'api/products/'
         }
 
         // this.usersRoutePath = '/api/usuarios';
@@ -55,6 +57,7 @@ class  Server {
         this.app.use(this.paths.usuarios, routerUsers)
         this.app.use(this.paths.auth, routerAuth)
         this.app.use(this.paths.category, routerCategory)
+        this.app.use(this.paths.products, routerProducts)
       
     }
 

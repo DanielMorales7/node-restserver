@@ -1,5 +1,4 @@
 import categoryModel from "../models/categoryModel.js";
-import usuarioModel from "../models/usuarioModel.js";
 import mongoose from "mongoose";
 
 // Obtener categorias - paginado - total -populate
@@ -13,11 +12,11 @@ const get_categories = async (req, res)=>{
         const [totaly, categories] = await  Promise.all([
             categoryModel.countDocuments({estado:true}),
             categoryModel.find({estado:true})
-                .populate('usuario')
-                .populate({
-                    path:'usuario',
-                    model:'usuarioModel'
-                })
+                .populate('usuario', 'nombre')
+                // .populate({
+                //     path:'usuario',
+                //     model:'usuarioModel'
+                // })
                 .skip(Number(desde))
                 .limit(Number(limit))
         ]);
@@ -36,13 +35,24 @@ const get_categories = async (req, res)=>{
 
 // Obtener categoria - populate
 
-const get_category = (req, res)=>{
+const get_category = async (req, res)=>{
 
     const {id} = req.params;
 
-    res.json({
-        msg:'Existe'
-    });
+    try {
+
+        const category = await categoryModel.findById(id)
+            .and({estado:true})
+            .populate('usuario','nombre')
+    
+        res.status(200).json({
+            category
+        });
+        
+    } catch (error) {
+        
+        console.log(error);
+    }
 
 }
 
@@ -80,11 +90,62 @@ const post_createCategory = async (req, res) => {
 
 // Actualizar categoria
 
+const put_updateCategory = async (req, res) =>{
+
+    const {id} = req.params;
+
+    try {
+
+        // ***** Verificar que el prodcuto esté true
+        // if(!estado){
+        //     return  res.status(400).json({
+        //         msg:'No se puede actualizar el producto'
+        //     });
+        // }
+        
+        const {estado, usuario, ...resto} = req.body;
+
+        resto.nombre = resto.nombre.toUpperCase();
+
+        const updateCategory = await categoryModel.findByIdAndUpdate(id,resto,{new:true})
+
+        res.status(200).json({
+            updateCategory
+        });
+        
+    } catch (error) {
+        
+        console.log(error);
+        
+    }
+
+}
+
 // Borrar categoria - cambiar a false
+
+const delete_deleteCategory = async (req, res) =>{
+
+    const {id} = req.params;
+
+    try {
+    
+        const updateCategory = await categoryModel.findByIdAndUpdate(id,{estado:false},{new:true})
+
+        res.status(200).json({
+            msg:'La categoria se ha eliminado correctamente'
+        });
+
+    } catch (error) {
+
+        console.log(error);
+    }
+}
 
 
 export {
     get_categories,
     post_createCategory,
-    get_category
+    get_category,
+    put_updateCategory,
+    delete_deleteCategory
 }
