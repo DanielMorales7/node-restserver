@@ -1,6 +1,7 @@
 import Role from "../models/rolModel.js";
 import usuarioModel from "../models/usuarioModel.js";
-import categoryModel from "../models/categoryModel.js"
+import categoryModel from "../models/categoryModel.js";
+import productModel from "../models/productModel.js";
 
 const rolValidate = async(rol = '') => {
     const existeRol = await Role.findOne({rol});
@@ -38,5 +39,20 @@ const categoryExist = async (id) =>{
     }
 }
 
+const productExist = async (id) =>{
 
-export { rolValidate, emailExist, userExist, categoryExist }
+    const existeProducto = await productModel.findById(id)
+
+    if(!existeProducto){
+        throw new Error(`El producto ${id} no existe en la BD`);
+    }
+}
+
+
+export { 
+    rolValidate,
+    emailExist,
+    userExist,
+    categoryExist,
+    productExist 
+}

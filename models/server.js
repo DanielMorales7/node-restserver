@@ -17,7 +17,7 @@ class  Server {
             usuarios:'/api/usuarios',
             auth:'/api/auth',
             category:'/api/category',
-            products:'api/products/'
+            products:'/api/products'
         }
 
         // this.usersRoutePath = '/api/usuarios';
