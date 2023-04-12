@@ -5,6 +5,7 @@ import routerAuth from '../routes/auth.js';
 import routerCategory from '../routes/category.js'
 import { dbConnection } from '../database/config.js';
 import routerProducts from '../routes/products.js';
+import routerFind from '../routes/buscar.js';
 
 
 class  Server {
@@ -17,7 +18,8 @@ class  Server {
             usuarios:'/api/usuarios',
             auth:'/api/auth',
             category:'/api/category',
-            products:'/api/products'
+            products:'/api/products',
+            find:'/api/find'
         }
 
         // this.usersRoutePath = '/api/usuarios';
@@ -58,6 +60,7 @@ class  Server {
         this.app.use(this.paths.auth, routerAuth)
         this.app.use(this.paths.category, routerCategory)
         this.app.use(this.paths.products, routerProducts)
+        this.app.use(this.paths.find, routerFind)
       
     }
 
