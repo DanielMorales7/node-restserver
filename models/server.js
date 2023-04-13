@@ -6,6 +6,8 @@ import routerCategory from '../routes/category.js'
 import { dbConnection } from '../database/config.js';
 import routerProducts from '../routes/products.js';
 import routerFind from '../routes/buscar.js';
+import routerUpload from '../routes/uploads.js';
+import fileUpload from 'express-fileupload';
 
 
 class  Server {
@@ -19,7 +21,8 @@ class  Server {
             auth:'/api/auth',
             category:'/api/category',
             products:'/api/products',
-            find:'/api/find'
+            find:'/api/find',
+            uploads:'/api/uploads'
         }
 
         // this.usersRoutePath = '/api/usuarios';
@@ -43,6 +46,8 @@ class  Server {
 
     middlewares(){
 
+        /**************** Todo esto se ejecuts antes de llegar a las rutas *****************/
+
         //CORS
         this.app.use( cors() );
 
@@ -51,7 +56,13 @@ class  Server {
 
         //Directorio Publico --> esto hace referencia al directorio raíz,
         // si se tiene otra cosa se podrá modificar
-        this.app.use( express.static('public') )
+        this.app.use( express.static('public') );
+
+        // CARGA DE ARCHIVOS
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/'
+        }));
     }
 
     routes(){
@@ -61,6 +72,7 @@ class  Server {
         this.app.use(this.paths.category, routerCategory)
         this.app.use(this.paths.products, routerProducts)
         this.app.use(this.paths.find, routerFind)
+        this.app.use(this.paths.uploads, routerUpload)
       
     }
 
