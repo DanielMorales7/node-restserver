@@ -43,13 +43,30 @@ const uploadFile = async(req, res =response) =>{
     
     // });
 
-    
-    const nombre = await subirArchivo(req.files);
 
-    res.json({ nombre });
+    try {
+        // Se utiliza el try y catch porque el reject revienta el await
+        // const nombre = await subirArchivo(req.files, ['png'], 'textos');
+        
+        // si quiero usar por defecto mando undefine
+        const nombre = await subirArchivo(req.files, undefined, 'imgs');
+        res.json({ nombre });
+        
+    } catch (msg) {
+        
+        res.status(400).json({msg})
+    }
     
 }
 
+const actualizarImagen = async (req, res = response)=>{
+
+    const {id, coleccion} = req.params;
+    res.json({id, coleccion});
+
+}
+
 export {
-    uploadFile
+    uploadFile,
+    actualizarImagen
 }

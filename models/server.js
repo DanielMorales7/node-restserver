@@ -61,8 +61,11 @@ class  Server {
         // CARGA DE ARCHIVOS
         this.app.use(fileUpload({
             useTempFiles : true,
-            tempFileDir : '/tmp/'
+            tempFileDir : '/tmp/',
+            createParentPath:true
         }));
+
+        // el createParentPath crea el directorio si no está hecho
     }
 
     routes(){

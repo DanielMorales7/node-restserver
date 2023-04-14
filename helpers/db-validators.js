@@ -2,6 +2,7 @@ import Role from "../models/rolModel.js";
 import usuarioModel from "../models/usuarioModel.js";
 import categoryModel from "../models/categoryModel.js";
 import productModel from "../models/productModel.js";
+import { Error } from "mongoose";
 
 const rolValidate = async(rol = '') => {
     const existeRol = await Role.findOne({rol});
@@ -48,11 +49,23 @@ const productExist = async (id) =>{
     }
 }
 
+const coleccionAllowed = (coleccion='', colecciones=[])=>{
+
+    const incluida = colecciones.includes(coleccion);
+
+    if(!incluida){
+        throw new Error(`La colección ${coleccion} no es permitida`);
+    }
+
+    return true;
+}
+
 
 export { 
     rolValidate,
     emailExist,
     userExist,
     categoryExist,
-    productExist 
+    productExist,
+    coleccionAllowed
 }
