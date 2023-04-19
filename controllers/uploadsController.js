@@ -1,14 +1,19 @@
+import fs from 'fs';
+import path from 'path';
 import {response} from 'express';
 import { subirArchivo } from '../helpers/subir-archivo.js';
+import { fileURLToPath } from 'url';
+import fetch from 'node-fetch';
+
 
 import usuarioModel from "../models/usuarioModel.js";
 import productModel from "../models/productModel.js";
 
 // const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-const uploadFile = async(req, res =response) =>{
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-    console.log(req);
+const uploadFile = async(req, res =response) =>{
  
     /************ASI SE HACE DESDE EL CONTROLADOR PERO LO HICIMOS HELPER ***********/
         // const { archivo } = req.files;  // archivo: archivo que se subió
@@ -88,6 +93,17 @@ const actualizarImagen = async (req, res = response)=>{
             return res.status(500).json({msg: 'No se ha válidado'});
     }
 
+    // LIMPIAR IMÁGENES PREVIAS
+
+    if(modelo.img){
+        //borrar la imagen del servidor
+        const pathImagen = path.join( __dirname, '../uploads', coleccion, modelo.img);
+
+        if(fs.existsSync(pathImagen)){
+            fs.unlinkSync(pathImagen);
+        }
+    }
+
     const nombre = await subirArchivo(req.files, undefined, coleccion);
 
     if (!nombre) {
@@ -104,7 +120,50 @@ const actualizarImagen = async (req, res = response)=>{
 
 }
 
+const mostrarImagen = async (req, res)=>{
+
+    const {id, coleccion} = req.params;
+
+    const pathNotImg = path.join( __dirname, '../assets/no-image.jpg');
+
+    let modelo;
+
+    switch (coleccion) {
+        case 'usuariomodels':
+            modelo = await usuarioModel.findById(id);
+            console.log(modelo);
+            if(!modelo){
+                return res.sendFile(pathNotImg);
+            }
+        break;
+        case 'products':
+            modelo = await productModel.findById(id);
+            if(!modelo){
+                return res.sendFile(pathNotImg);
+            }
+        break;
+    
+        default:
+            return res.status(500).json({msg: 'No se ha válidado'});
+    }
+
+    // LIMPIAR IMÁGENES PREVIAS
+
+    if(modelo.img){
+        //borrar la imagen del servidor
+        const pathImagen = path.join( __dirname, '../uploads', coleccion, modelo.img);
+
+        if(fs.existsSync(pathImagen)){
+            return res.sendFile(pathImagen);
+        }
+    }
+    
+    res.sendFile(pathNotImg);
+}
+
+
 export {
     uploadFile,
-    actualizarImagen
+    actualizarImagen,
+    mostrarImagen
 }
