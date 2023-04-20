@@ -3,11 +3,19 @@ import path from 'path';
 import {response} from 'express';
 import { subirArchivo } from '../helpers/subir-archivo.js';
 import { fileURLToPath } from 'url';
-import fetch from 'node-fetch';
-
+import * as Cloudinary from 'cloudinary';
+import * as dotenv from 'dotenv';
+dotenv.config();
+Cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+    secure:true
+});
 
 import usuarioModel from "../models/usuarioModel.js";
 import productModel from "../models/productModel.js";
+import { model } from 'mongoose';
 
 // const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -161,9 +169,63 @@ const mostrarImagen = async (req, res)=>{
     res.sendFile(pathNotImg);
 }
 
+const actualizarImagenCloudinary = async (req, res = response)=>{
+
+    const {id, coleccion} = req.params;
+
+    let modelo;
+
+    switch (coleccion) {
+        case 'usuariomodels':
+            modelo = await usuarioModel.findById(id);
+            console.log(modelo);
+            if(!modelo){
+                return res.status(400).json({
+                    msg:`No existe un usuario con el id ${id}`
+                });
+            }
+        break;
+        case 'products':
+            modelo = await productModel.findById(id);
+            if(!modelo){
+                return res.status(400).json({
+                    msg:`No existe un producto con el id ${id}`
+                });
+            }
+        break;
+    
+        default:
+            return res.status(500).json({msg: 'No se ha válidado'});
+    }
+
+    // LIMPIAR IMÁGENES PREVIAS
+
+    if(modelo.img){
+        //borrar la imagen del servidor
+        const nombreArr   = modelo.img.split('/');
+        const nombre      =  nombreArr[ nombreArr.length - 1];
+        const [public_id] =  nombre.split('.');
+        Cloudinary.uploader.destroy(public_id);
+        
+    }
+
+    const {tempFilePath} = req.files.archivo;
+
+    // regresa una promesa
+    const {secure_url} = await Cloudinary.uploader.upload(tempFilePath);
+
+    modelo.img = secure_url;
+
+    await modelo.save();
+
+    res.json(modelo);
+
+}
+
 
 export {
     uploadFile,
     actualizarImagen,
-    mostrarImagen
+    mostrarImagen,
+    actualizarImagenCloudinary
 }
